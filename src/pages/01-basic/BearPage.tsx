@@ -95,12 +95,16 @@ export const BearDisplay = () => {
   // y si algo cambió, no lo renderiza inútilmente
   const bears = useBearStore( useShallow( state => state.bears ));
   const doNothing = useBearStore( state => state.doNothing );
+  const addBear = useBearStore( state => state.addBear )
+  const clearBears = useBearStore( state => state.clearBears )
   
   return (
     <WhiteCard>
       <h1>Ositos:</h1>
 
-      <button onClick={ doNothing }> Do Nothing</button>
+      <button className="m-2" onClick={ doNothing }> Nada</button>
+      <button className="m-2" onClick={ addBear }> Agregar oso</button>
+      <button className="m-2" onClick={ clearBears }> Limpiar osos</button>
       
       <pre>
         {JSON.stringify(bears, null, 2)}
