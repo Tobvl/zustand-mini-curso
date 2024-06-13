@@ -1,22 +1,13 @@
 import { StateStorage, createJSONStorage } from "zustand/middleware";
-
-const firebaseUrl = 'https://zustand-test1-default-rtdb.firebaseio.com/zustand.json';
-
+// con CTRL+. en sessionStorage podremos agregar
+// las propiedades que debemos implementar
 const storageAPI: StateStorage = {
   
-  getItem: async function (name: string): Promise<string | null>{
+  // getItem es cuando se carga el estado
+  getItem: function (name: string): string | Promise<string | null> | null {
 
-    // grabar en Firebase
-    try {
-      const data = await fetch(`${firebaseUrl}/${name}`)
-        .then( res => res.json())
-        .catch((e) => {throw e});
-      console.log(data)
-      return data;
-    } catch (error) {
-      return null
-    }
-
+    const data = sessionStorage.getItem(name);
+    return data;
   },
   setItem: function (name: string, value: string): void {
     
