@@ -3,6 +3,7 @@
 // interfaz
 import { type StateCreator, create } from 'zustand';
 import { StateStorage, createJSONStorage, persist } from 'zustand/middleware';
+import { customSessionStorage } from '../storages/session.storage';
 
 interface PersonState {
   firstName: string,
@@ -25,25 +26,7 @@ const storeAPI: StateCreator<PersonState & Actions> = (set) => ({
 
 });
 
-// con CTRL+. en sessionStorage podremos agregar
-// las propiedades que debemos implementar
-const customSessionStorage: StateStorage = {
-  
-  // getItem es cuando se carga el estado
-  getItem: function (name: string): string | Promise<string | null> | null {
 
-    const data = sessionStorage.getItem(name);
-    return data;
-  },
-  setItem: function (name: string, value: string): void {
-    
-    sessionStorage.setItem(name, value)
-  },
-  removeItem: function (name: string): unknown {
-    console.log('removeItem', name)
-    return null;
-  }
-}
 
 // el create es un genérico de PersonState y Actions
 export const usePersonStore = create<PersonState & Actions>()(
@@ -60,6 +43,6 @@ export const usePersonStore = create<PersonState & Actions>()(
     // entonces le pasamos a la función createJSONStorage
     // el sessionStorage definido
     // por medio de un callback
-    storage: createJSONStorage(() => customSessionStorage),
+    storage: customSessionStorage,
   })
 )
