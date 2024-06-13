@@ -1,22 +1,52 @@
 import { StateStorage, createJSONStorage } from "zustand/middleware";
-// con CTRL+. en sessionStorage podremos agregar
-// las propiedades que debemos implementar
+
+const firebaseUrl = 'https://zustand-test1-default-rtdb.firebaseio.com/zustand';
+
 const storageAPI: StateStorage = {
   
-  // getItem es cuando se carga el estado
-  getItem: function (name: string): string | Promise<string | null> | null {
+  getItem: async function (name: string): Promise<string | null>{
 
-    const data = sessionStorage.getItem(name);
-    return data;
+    // buscar la información desde Firebase
+    try {
+      const data = await fetch(`${firebaseUrl}/${name}.json`)
+      .then( res => res.json())
+      .catch((e) => (console.log(e)));
+      console.log(data);
+      // Para ver la data tenemos dos opciones, devolverla como string aquí
+      // o devolver el objeto `data` solamente y en la petición PUT
+      // enviarlo como string
+      return JSON.stringify(data);
+    } catch (error) {
+      return null;
+    }
+
   },
-  setItem: function (name: string, value: string): void {
+
+  // CONSIDERACIÓN IMPORTANTE << CONDICIÓN DE CARRERA >>
+  // cada letra que se actualiza, genera una petición al backend Firebase
+  // el problema es que puede quedar una petición anterior guardada y ésta
+  // ejecutarse después de una petición más nueva, por lo que "los cambios
+  // no se guardarían", entonces (con AXIOS) se puede crear un AbortController
+  // y éste, va a cancelar las peticiones anteriores cuando reciba una nueva
+  // y sólo quedará con la última información actualizada
+  setItem: async function (name: string, value: string): Promise<void> {
     
-    sessionStorage.setItem(name, value)
+    // ahora para guardar información lo haremos también en firebase
+    // const data = 
+    await fetch(`${firebaseUrl}/${name}.json`, {
+      method:'PUT',
+      body:value
+    }).then( res => res.json());
+
+    // console.log(data)
+    
+    return;
   },
+  
   removeItem: function (name: string): unknown {
     console.log('removeItem', name)
     return null;
   }
 }
 
-export const customSessionStorage = createJSONStorage(() => storageAPI)
+export const firebaseStorage = createJSONStorage(() => storageAPI)
