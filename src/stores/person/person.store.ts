@@ -2,10 +2,10 @@
 // importe nada ya que lo utilizaremos solo como
 // interfaz
 import { type StateCreator, create } from 'zustand';
-import { StateStorage, createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 // import { customSessionStorage } from '../storages/session.storage';
 import { firebaseStorage } from '../storages/firebase.storage';
-import { logger } from '../middlewares/logger.middleware';
+// import { logger } from '../middlewares/logger.middleware';
 
 interface PersonState {
   firstName: string,
@@ -23,8 +23,8 @@ const storeAPI: StateCreator<PersonState & Actions, [["zustand/devtools", never]
   firstName: "",
   lastName: "",
 
-  setFirstName: (value: string) => set((state) => ({firstName: value}), false, 'setFirstName'),
-  setLastName: (value: string) => set((state) => ({lastName: value}), false, 'setLastName')
+  setFirstName: (value: string) => set(({firstName: value}), false, 'setFirstName'),
+  setLastName: (value: string) => set(({lastName: value}), false, 'setLastName')
 
 });
 
@@ -41,17 +41,17 @@ export const usePersonStore = create<PersonState & Actions>()(
   
   // logger(
   // ) middleware, produce un nuevo estado
-    devtools(
-      persist(
-        storeAPI, {
-          // aquí tenemos otra propiedad que se llama storage
-          // que espera algo de tipo createJSONStorage
-          name:'person-storage',
-          // entonces le pasamos a la función createJSONStorage
-          // el sessionStorage definido
-          // por medio de un callback
-          storage: firebaseStorage,
-        }
-      )
+  devtools(
+    persist(
+      storeAPI, {
+        // aquí tenemos otra propiedad que se llama storage
+        // que espera algo de tipo createJSONStorage
+        name:'person-storage',
+        // entonces le pasamos a la función createJSONStorage
+        // el sessionStorage definido
+        // por medio de un callback
+        storage: firebaseStorage,
+      }
     )
+  )
 );
