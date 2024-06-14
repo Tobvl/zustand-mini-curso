@@ -50,7 +50,7 @@ export const usePersonStore = create<PersonState & Actions>()(
         // entonces le pasamos a la función createJSONStorage
         // el sessionStorage definido
         // por medio de un callback
-        storage: firebaseStorage,
+        // storage: firebaseStorage,
       }
     )
   )
