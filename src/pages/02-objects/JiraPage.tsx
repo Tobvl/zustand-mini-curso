@@ -3,8 +3,6 @@ import { useTaskStore } from '../../stores';
 
 export const JiraPage = () => {
 
-  const tasks = useTaskStore( state => state.tasks );
-
   const pendingTasks = useTaskStore( state => state.getTaskByStatus('open'))
   const inProgressTasks = useTaskStore( state => state.getTaskByStatus('in-progress'))
   const doneTasks = useTaskStore( state => state.getTaskByStatus('done'))
@@ -19,11 +17,11 @@ export const JiraPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
-          <JiraTasks title='Pendientes' tasks={ pendingTasks } value='open' />
+          <JiraTasks title='Pendientes' tasks={ pendingTasks } status='open' />
           
-          <JiraTasks title='Avanzando' tasks={ inProgressTasks }  value='in-progress' />
+          <JiraTasks title='Avanzando' tasks={ inProgressTasks }  status='in-progress' />
           
-          <JiraTasks title='Terminadas' tasks= { doneTasks } value='done' />
+          <JiraTasks title='Terminadas' tasks= { doneTasks } status='done' />
 
       </div>
 
