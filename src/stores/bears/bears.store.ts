@@ -62,7 +62,7 @@ export const useBearStore = create<BearState>()(
   //   }
   // },
   
-  totalBears: () => {  
+  totalBears: () => {
     return get().blackBears +
     get().polarBears +
     get().pandaBears +

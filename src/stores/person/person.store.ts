@@ -2,9 +2,10 @@
 // importe nada ya que lo utilizaremos solo como
 // interfaz
 import { type StateCreator, create } from 'zustand';
-import { StateStorage, createJSONStorage, persist } from 'zustand/middleware';
+import { StateStorage, createJSONStorage, devtools, persist } from 'zustand/middleware';
 // import { customSessionStorage } from '../storages/session.storage';
 import { firebaseStorage } from '../storages/firebase.storage';
+import { logger } from '../middlewares/logger.middleware';
 
 interface PersonState {
   firstName: string,
@@ -18,12 +19,12 @@ interface Actions {
 }
 
 
-const storeAPI: StateCreator<PersonState & Actions> = (set) => ({
+const storeAPI: StateCreator<PersonState & Actions, [["zustand/devtools", never]]> = (set) => ({
   firstName: "",
   lastName: "",
 
-  setFirstName: (value: string) => set((state) => ({firstName: value})),
-  setLastName: (value: string) => set((state) => ({lastName: value}))
+  setFirstName: (value: string) => set((state) => ({firstName: value}), false, 'setFirstName'),
+  setLastName: (value: string) => set((state) => ({lastName: value}), false, 'setLastName')
 
 });
 
@@ -35,15 +36,22 @@ export const usePersonStore = create<PersonState & Actions>()(
   // localstorage, debemos envolver toda la función
   // set de nuestro Store y al final, agregarle un objeto
   // con el nombre que tendrá el storage en localstorage
-  persist(
-    storeAPI
-  , {
-    // aquí tenemos otra propiedad que se llama storage
-    // que espera algo de tipo createJSONStorage
-    name:'person-storage',
-    // entonces le pasamos a la función createJSONStorage
-    // el sessionStorage definido
-    // por medio de un callback
-    storage: firebaseStorage,
-  })
-)
+
+  // podemos integrar Redux DevTools integrando todo a su middleware correspondiente
+  
+  // logger(
+  // ) middleware, produce un nuevo estado
+    devtools(
+      persist(
+        storeAPI, {
+          // aquí tenemos otra propiedad que se llama storage
+          // que espera algo de tipo createJSONStorage
+          name:'person-storage',
+          // entonces le pasamos a la función createJSONStorage
+          // el sessionStorage definido
+          // por medio de un callback
+          storage: firebaseStorage,
+        }
+      )
+    )
+);
