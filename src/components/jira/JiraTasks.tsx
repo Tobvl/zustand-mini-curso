@@ -1,6 +1,10 @@
 import { DragEvent, useState } from "react";
-import {IoCheckmarkCircleOutline, IoEllipsisHorizontalOutline,} from "react-icons/io5";
+// IoEllipsisHorizontalOutline
+import {IoAddOutline, IoCheckmarkCircleOutline} from "react-icons/io5";
+
 import classNames from "classnames";
+import Swal from "sweetalert2";
+
 import { Task, TaskStatus } from "../../interfaces";
 import { SingleTask } from "./SingleTask";
 import { useTaskStore } from "../../stores";
@@ -8,16 +12,45 @@ import { useTaskStore } from "../../stores";
 interface Props {
   title: string;
   tasks: Task[];
-  value: TaskStatus;
+  status: TaskStatus;
 }
 
-export const JiraTasks = ({ title, value, tasks }: Props) => {
+export const JiraTasks = ({ title, status, tasks }: Props) => {
 
   // convertimos a booleano si está 
   const isDragging = useTaskStore( state => !!state.draggingTaskId );
-  const draggingTaskId = useTaskStore( state => state.draggingTaskId );
-  const changeTaskStatus = useTaskStore( state => state.changeTaskStatus );
+  // implementamos el onTaskDrop para que 
+  const onTaskDrop = useTaskStore( state => state.onTaskDrop );
+  const addTask = useTaskStore( state => state.addTask );
+
   const [onDragOver, setOnDragOver] = useState(false);
+  
+  const handleAddTask = async() => {
+
+    // lo podemos manejar como una variable
+    // pero es más cómodo desestructurar de una vez
+    const {isConfirmed, value} = await Swal.fire({
+      title: "Nueva tarea",
+      input: "text",
+      inputLabel: 'Nombre de la tarea: ',
+      inputPlaceholder: 'Tarea 123',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Debe ingresar un nombre para la tarea!'
+        }
+        if (value.length <= 4){
+          return 'El título debe contener más de 4 letras!'
+        }
+      }
+    });
+    
+    // console.log(nuevo_titulo)
+    if (!isConfirmed) return;
+    addTask(value, status)
+    
+    
+  }
   
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -34,7 +67,7 @@ export const JiraTasks = ({ title, value, tasks }: Props) => {
     setOnDragOver(false);
     // le colocamos el ! para asumir que siempre lo tenemos, teniendo en cuenta
     // que puede ser nulo (not dragging any item)
-    changeTaskStatus(draggingTaskId!, value)
+    onTaskDrop(status)
   };
 
   return (
@@ -42,6 +75,7 @@ export const JiraTasks = ({ title, value, tasks }: Props) => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      onDragEnd={() => console.log("dragend")}
       className={
         // Aquí le damos las mismas clases de TW al div, pero le colocamos
         // las siguientes cuando isDragging sea True
@@ -62,8 +96,9 @@ export const JiraTasks = ({ title, value, tasks }: Props) => {
           <h4 className="ml-4 text-xl font-bold text-navy-700">{title}</h4>
         </div>
 
-        <button>
-          <IoEllipsisHorizontalOutline />
+        <button onClick={handleAddTask}>
+          {/* <IoEllipsisHorizontalOutline /> */}
+          <IoAddOutline/>
         </button>
       </div>
 
