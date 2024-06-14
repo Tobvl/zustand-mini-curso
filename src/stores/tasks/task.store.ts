@@ -14,6 +14,7 @@ interface TaskState {
   // crearemos el state para el Drag n' Drop
   setDraggingTaskId: (taskId: string) => void;
   resetDraggingTaskid: () => void;
+  changeTaskStatus: (taskId: string, status: TaskStatus) => void;
   
 }
 
@@ -38,13 +39,26 @@ const storeApi: StateCreator<TaskState> = (set, get) => ({
   // método que actualizará el estado del store con
   // el draggingTaskId correspondiente
   setDraggingTaskId: (taskId: string) => {
-    console.log(taskId)
     set({ draggingTaskId: taskId})
   },
   resetDraggingTaskid: () => {
-    console.log("reset")
     set({ draggingTaskId: undefined})
   },
+  
+  changeTaskStatus: (taskId: string, status: TaskStatus) => {
+
+    const task = get().tasks[taskId]
+    task.status = status
+    
+    // en este momento debo encontrar la tarea con el taskId especificado
+    // y asignarle el status proporcionado
+    set( (state) => ({
+      tasks: {
+        ...state.tasks,
+        [taskId] : task,
+      }
+    }))
+  }
   
 })
 

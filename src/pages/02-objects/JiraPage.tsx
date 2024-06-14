@@ -9,10 +9,7 @@ export const JiraPage = () => {
   const inProgressTasks = useTaskStore( state => state.getTaskByStatus('in-progress'))
   const doneTasks = useTaskStore( state => state.getTaskByStatus('done'))
 
-  
-  
-  console.log(tasks)
-  console.log({pendingTasks, inProgressTasks, doneTasks})
+  // console.log({pendingTasks, inProgressTasks, doneTasks})
   
   return (
     <>
